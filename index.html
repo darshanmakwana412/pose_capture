@@ -33,6 +33,7 @@
     <p>Acceleration (X): <span id="accelX">0</span> m/s²</p>
     <p>Acceleration (Y): <span id="accelY">0</span> m/s²</p>
     <p>Acceleration (Z): <span id="accelZ">0</span> m/s²</p>
+    <p>Interval: <span id="interval">0</span> ms</p>
   </div>
 
   <script>
@@ -51,11 +52,12 @@
 
     function getMotion(event) {
       const accel = event.acceleration;
-      const accelG = event.accelerationIncludingGravity;
+      const timestamp = event.interval;
 
       document.getElementById("accelX").textContent = accel.x.toFixed(2);
       document.getElementById("accelY").textContent = accel.y.toFixed(2);
       document.getElementById("accelZ").textContent = accel.z.toFixed(2);
+      document.getElementById("interval").textContent = timestamp;
     }
 
     window.addEventListener("deviceorientation", getOrientation);
