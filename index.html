@@ -29,55 +29,58 @@
     <p>Gamma (Y-axis tilt): <span id="gamma">0</span>°</p>
   </div>
 
+  <!-- Motion Data -->
   <div id="motionData">
     <h2>Position</h2>
     <p>Acceleration (X): <span id="accelX">0</span> m/s²</p>
     <p>Acceleration (Y): <span id="accelY">0</span> m/s²</p>
     <p>Acceleration (Z): <span id="accelZ">0</span> m/s²</p>
-    <p>Acceleration including gravity (X): <span id="accelGx">0</span> m/s²</p>
-    <p>Acceleration including gravity (Y): <span id="accelGy">0</span> m/s²</p>
-    <p>Acceleration including gravity (Z): <span id="accelGz">0</span> m/s²</p>
-    <p>Rotation rate alpha (Z-axis): <span id="rotationAlpha">0</span>°/s</p>
-    <p>Rotation rate beta (X-axis): <span id="rotationBeta">0</span>°/s</p>
-    <p>Rotation rate gamma (Y-axis): <span id="rotationGamma">0</span>°/s</p>
+    <p>Translation (X): <span id="posX">0</span> m</p>
+    <p>Translation (Y): <span id="posY">0</span> m</p>
+    <p>Translation (Z): <span id="posZ">0</span> m</p>
   </div>
 
   <script>
-  
-    function getOrientation(event) {
-      const alpha = event.alpha.toFixed(2);
-      const beta = event.beta.toFixed(2);
-      const gamma = event.gamma.toFixed(2);
-      const absolute = event.absolute;
+    let velocity = { x: 0, y: 0, z: 0 };
+    let position = { x: 0, y: 0, z: 0 };
+    let lastTime = null;
 
-      document.getElementById("absolute").textContent = absolute;
-      document.getElementById("alpha").textContent = alpha;
-      document.getElementById("beta").textContent = beta;
-      document.getElementById("gamma").textContent = gamma;
-    }
-
+    // Function to handle motion events and calculate translation
     function getMotion(event) {
       const accel = event.acceleration;
-      const accelG = event.accelerationIncludingGravity;
-      const rotationRate = event.rotationRate;
+      const timestamp = event.timeStamp; // Time of the event in milliseconds
 
-      document.getElementById("accelX").textContent = accel.x.toFixed(2);
-      document.getElementById("accelY").textContent = accel.y.toFixed(2);
-      document.getElementById("accelZ").textContent = accel.z.toFixed(2);
+      // Time difference (deltaTime) in seconds
+      if (lastTime === null) {
+        lastTime = timestamp;
+        return;
+      }
+      const deltaTime = (timestamp - lastTime) / 1000; // Convert ms to seconds
+      lastTime = timestamp;
 
-      document.getElementById("accelGx").textContent = accelG.x.toFixed(2);
-      document.getElementById("accelGy").textContent = accelG.y.toFixed(2);
-      document.getElementById("accelGz").textContent = accelG.z.toFixed(2);
+      // Update velocity: v = v + a * t
+      velocity.x += (accel.x || 0) * deltaTime;
+      velocity.y += (accel.y || 0) * deltaTime;
+      velocity.z += (accel.z || 0) * deltaTime;
 
-      document.getElementById("rotationAlpha").textContent = rotationRate.alpha.toFixed(2);
-      document.getElementById("rotationBeta").textContent = rotationRate.beta.toFixed(2);
-      document.getElementById("rotationGamma").textContent = rotationRate.gamma.toFixed(2);
+      // Update position: s = s + v * t
+      position.x += velocity.x * deltaTime;
+      position.y += velocity.y * deltaTime;
+      position.z += velocity.z * deltaTime;
+
+      // Display acceleration data
+      document.getElementById("accelX").textContent = accel.x ? accel.x.toFixed(2) : 0;
+      document.getElementById("accelY").textContent = accel.y ? accel.y.toFixed(2) : 0;
+      document.getElementById("accelZ").textContent = accel.z ? accel.z.toFixed(2) : 0;
+
+      // Display position (translation) data
+      document.getElementById("posX").textContent = position.x.toFixed(2);
+      document.getElementById("posY").textContent = position.y.toFixed(2);
+      document.getElementById("posZ").textContent = position.z.toFixed(2);
     }
 
-    window.addEventListener("deviceorientationabsolute", getOrientation);
+    // Add event listener for motion events
     window.addEventListener("devicemotion", getMotion);
-    
   </script>
-  
 </body>
 </html>
