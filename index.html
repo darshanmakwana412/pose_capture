@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Device Orientation Monitor</title>
+  <title>Device Orientation and Position Monitor</title>
   <style>
     body {
       font-family: Arial, sans-serif;
     }
-    #orientationData {
+    #orientationData, #motionData {
       margin-top: 20px;
     }
     .matrix {
@@ -18,9 +18,12 @@
   </style>
 </head>
 <body>
-  <h1>Device Orientation</h1>
+  <h1>Device Orientation and Position</h1>
+  
+  <!-- Orientation Data -->
   <div id="orientationData">
-  	<p>Absolute: <span id="absolute">0</span></p>
+    <h2>Orientation</h2>
+    <p>Absolute: <span id="absolute">0</span></p>
     <p>Alpha (Z-axis rotation): <span id="alpha">0</span>°</p>
     <p>Beta (X-axis tilt): <span id="beta">0</span>°</p>
     <p>Gamma (Y-axis tilt): <span id="gamma">0</span>°</p>
@@ -28,70 +31,56 @@
     <pre id="matrix" class="matrix"></pre>
   </div>
 
+  <!-- Motion Data -->
+  <div id="motionData">
+    <h2>Position</h2>
+    <p>Acceleration (X): <span id="accelX">0</span> m/s²</p>
+    <p>Acceleration (Y): <span id="accelY">0</span> m/s²</p>
+    <p>Acceleration (Z): <span id="accelZ">0</span> m/s²</p>
+    <p>Acceleration including gravity (X): <span id="accelGx">0</span> m/s²</p>
+    <p>Acceleration including gravity (Y): <span id="accelGy">0</span> m/s²</p>
+    <p>Acceleration including gravity (Z): <span id="accelGz">0</span> m/s²</p>
+    <p>Rotation rate alpha (Z-axis): <span id="rotationAlpha">0</span>°/s</p>
+    <p>Rotation rate beta (X-axis): <span id="rotationBeta">0</span>°/s</p>
+    <p>Rotation rate gamma (Y-axis): <span id="rotationGamma">0</span>°/s</p>
+  </div>
+
   <script>
-    function getOrientationMatrix(event) {
+  
+    function getOrientation(event) {
+      const alpha = event.alpha.toFixed(2);
+      const beta = event.beta.toFixed(2);
+      const gamma = event.gamma.toFixed(2);
       const absolute = event.absolute;
-      const alpha = event.alpha * Math.PI / 180; // Z-axis rotation (compass heading)
-      const beta = event.beta * Math.PI / 180; // X-axis rotation (front-to-back tilt)
-      const gamma = event.gamma * Math.PI / 180; // Y-axis rotation (side-to-side tilt)
 
-	  document.getElementById("absolute").textContent = event.absolute;
-      document.getElementById("alpha").textContent = event.alpha;
-      document.getElementById("beta").textContent = event.beta;
-      document.getElementById("gamma").textContent = event.gamma;
-
-      const rotZ = [
-        [Math.cos(alpha), -Math.sin(alpha), 0, 0],
-        [Math.sin(alpha), Math.cos(alpha), 0, 0],
-        [0, 0, 1, 0],
-        [0, 0, 0, 1]
-      ];
-
-      const rotX = [
-        [1, 0, 0, 0],
-        [0, Math.cos(beta), -Math.sin(beta), 0],
-        [0, Math.sin(beta), Math.cos(beta), 0],
-        [0, 0, 0, 1]
-      ];
-
-      const rotY = [
-        [Math.cos(gamma), 0, Math.sin(gamma), 0],
-        [0, 1, 0, 0],
-        [-Math.sin(gamma), 0, Math.cos(gamma), 0],
-        [0, 0, 0, 1]
-      ];
-
-      const R = matmul(matmul(rotZ, rotX), rotY);
-      return R;
+      document.getElementById("absolute").textContent = absolute;
+      document.getElementById("alpha").textContent = alpha;
+      document.getElementById("beta").textContent = beta;
+      document.getElementById("gamma").textContent = gamma;
     }
 
-    function matmul(a, b) {
-      const M = [];
-      for (let i = 0; i < a.length; i++) {
-        M.push([]);
-        for (let j = 0; j < b[0].length; j++) {
-          let sum = 0;
-          for (let k = 0; k < b.length; k++) {
-            sum += a[i][k] * b[k][j];
-          }
-          M[i].push(sum);
-        }
-      }
-      return M;
+    function getMotion(event) {
+      const accel = event.acceleration;
+      const accelG = event.accelerationIncludingGravity;
+      const rotationRate = event.rotationRate;
+
+      document.getElementById("accelX").textContent = accel.x.toFixed(2);
+      document.getElementById("accelY").textContent = accel.y.toFixed(2);
+      document.getElementById("accelZ").textContent = accel.z.toFixed(2);
+
+      document.getElementById("accelGx").textContent = accelG.x.toFixed(2);
+      document.getElementById("accelGy").textContent = accelG.y.toFixed(2);
+      document.getElementById("accelGz").textContent = accelG.z.toFixed(2);
+
+      document.getElementById("rotationAlpha").textContent = rotationRate.alpha.toFixed(2);
+      document.getElementById("rotationBeta").textContent = rotationRate.beta.toFixed(2);
+      document.getElementById("rotationGamma").textContent = rotationRate.gamma.toFixed(2);
     }
 
-    function displayMatrix(matrix) {
-      let matrixString = '';
-      matrix.forEach(row => {
-        matrixString += row.map(num => num.toFixed(4)).join('  ') + '\n';
-      });
-      document.getElementById('matrix').textContent = matrixString;
-    }
-
-    window.addEventListener("deviceorientation", (event) => {
-      const matrix = getOrientationMatrix(event);
-      displayMatrix(matrix);
-    });
+    window.addEventListener("deviceorientationabsolute", getOrientation);
+    window.addEventListener("devicemotion", getMotion);
+    
   </script>
+  
 </body>
 </html>
