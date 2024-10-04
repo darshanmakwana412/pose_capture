@@ -33,46 +33,35 @@
     <p>Acceleration (X): <span id="accelX">0</span> m/s²</p>
     <p>Acceleration (Y): <span id="accelY">0</span> m/s²</p>
     <p>Acceleration (Z): <span id="accelZ">0</span> m/s²</p>
-    <p>Translation (X): <span id="posX">0</span> m</p>
-    <p>Translation (Y): <span id="posY">0</span> m</p>
-    <p>Translation (Z): <span id="posZ">0</span> m</p>
   </div>
 
   <script>
-    let velocity = { x: 0, y: 0, z: 0 };
-    let position = { x: 0, y: 0, z: 0 };
-    let lastTime = null;
+  
+    function getOrientation(event) {
+      const alpha = event.alpha.toFixed(2);
+      const beta = event.beta.toFixed(2);
+      const gamma = event.gamma.toFixed(2);
+      const absolute = event.absolute;
+
+      document.getElementById("absolute").textContent = absolute;
+      document.getElementById("alpha").textContent = alpha;
+      document.getElementById("beta").textContent = beta;
+      document.getElementById("gamma").textContent = gamma;
+    }
 
     function getMotion(event) {
       const accel = event.acceleration;
-      const timestamp = event.timeStamp;
+      const accelG = event.accelerationIncludingGravity;
 
-      if (lastTime === null) {
-        lastTime = timestamp;
-        return;
-      }
-      const deltaTime = (timestamp - lastTime) / 1000;
-      lastTime = timestamp;
-
-      velocity.x += (accel.x || 0) * deltaTime;
-      velocity.y += (accel.y || 0) * deltaTime;
-      velocity.z += (accel.z || 0) * deltaTime;
-
-      position.x += velocity.x * deltaTime;
-      position.y += velocity.y * deltaTime;
-      position.z += velocity.z * deltaTime;
-
-      document.getElementById("accelX").textContent = accel.x ? accel.x.toFixed(2) : 0;
-      document.getElementById("accelY").textContent = accel.y ? accel.y.toFixed(2) : 0;
-      document.getElementById("accelZ").textContent = accel.z ? accel.z.toFixed(2) : 0;
-
-      document.getElementById("posX").textContent = position.x.toFixed(2);
-      document.getElementById("posY").textContent = position.y.toFixed(2);
-      document.getElementById("posZ").textContent = position.z.toFixed(2);
+      document.getElementById("accelX").textContent = accel.x.toFixed(2);
+      document.getElementById("accelY").textContent = accel.y.toFixed(2);
+      document.getElementById("accelZ").textContent = accel.z.toFixed(2);
     }
 
     window.addEventListener("deviceorientation", getOrientation);
     window.addEventListener("devicemotion", getMotion);
+    
   </script>
+  
 </body>
 </html>
