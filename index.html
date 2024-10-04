@@ -20,7 +20,6 @@
 <body>
   <h1>Device Orientation and Position</h1>
   
-  <!-- Orientation Data -->
   <div id="orientationData">
     <h2>Orientation</h2>
     <p>Absolute: <span id="absolute">0</span></p>
@@ -29,7 +28,6 @@
     <p>Gamma (Y-axis tilt): <span id="gamma">0</span>°</p>
   </div>
 
-  <!-- Motion Data -->
   <div id="motionData">
     <h2>Position</h2>
     <p>Acceleration (X): <span id="accelX">0</span> m/s²</p>
@@ -45,41 +43,35 @@
     let position = { x: 0, y: 0, z: 0 };
     let lastTime = null;
 
-    // Function to handle motion events and calculate translation
     function getMotion(event) {
       const accel = event.acceleration;
-      const timestamp = event.timeStamp; // Time of the event in milliseconds
+      const timestamp = event.timeStamp;
 
-      // Time difference (deltaTime) in seconds
       if (lastTime === null) {
         lastTime = timestamp;
         return;
       }
-      const deltaTime = (timestamp - lastTime) / 1000; // Convert ms to seconds
+      const deltaTime = (timestamp - lastTime) / 1000;
       lastTime = timestamp;
 
-      // Update velocity: v = v + a * t
       velocity.x += (accel.x || 0) * deltaTime;
       velocity.y += (accel.y || 0) * deltaTime;
       velocity.z += (accel.z || 0) * deltaTime;
 
-      // Update position: s = s + v * t
       position.x += velocity.x * deltaTime;
       position.y += velocity.y * deltaTime;
       position.z += velocity.z * deltaTime;
 
-      // Display acceleration data
       document.getElementById("accelX").textContent = accel.x ? accel.x.toFixed(2) : 0;
       document.getElementById("accelY").textContent = accel.y ? accel.y.toFixed(2) : 0;
       document.getElementById("accelZ").textContent = accel.z ? accel.z.toFixed(2) : 0;
 
-      // Display position (translation) data
       document.getElementById("posX").textContent = position.x.toFixed(2);
       document.getElementById("posY").textContent = position.y.toFixed(2);
       document.getElementById("posZ").textContent = position.z.toFixed(2);
     }
 
-    // Add event listener for motion events
+    window.addEventListener("deviceorientation", getOrientation);
     window.addEventListener("devicemotion", getMotion);
   </script>
 </body>
